@@ -1,4 +1,4 @@
-package com.example.android_memo;
+package com.example.android_memo_2;
 
 import org.junit.Test;
 
