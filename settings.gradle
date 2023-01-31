@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "android_memo_2"
+rootProject.name = "memo_android"
 include ':app'
