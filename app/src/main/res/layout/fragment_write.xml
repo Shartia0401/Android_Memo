@@ -2,9 +2,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/writefrag"
     android:layout_width="match_parent"
+
     android:layout_height="match_parent"
-    tools:context=".writeFragment">
+    tools:context=".WriteFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,9 +17,10 @@
             android:layout_width="367dp"
             android:layout_height="572dp"
             android:layout_marginBottom="36dp"
+            android:background="@null"
             android:ems="10"
             android:gravity="start|top"
-            android:background="@null"
+            android:hint="내용"
             android:inputType="textMultiLine"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,16 +31,17 @@
 
         <EditText
             android:id="@+id/TitleText"
-            android:contentDescription=""
-            android:layout_width="357dp"
-            android:layout_height="57dp"
-            android:ems="10"
-            android:inputType="textPersonName"
+            android:layout_width="369dp"
+            android:layout_height="56dp"
             android:background="@null"
+            android:contentDescription=""
+            android:ems="10"
+            android:hint="제목"
+            android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.523"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="52dp"
-            tools:ignore="Autofill,MissingConstraints" />
+            tools:ignore="Autofill,MissingConstraints"
+            tools:layout_editor_absoluteY="67dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
