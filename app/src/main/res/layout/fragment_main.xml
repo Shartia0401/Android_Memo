@@ -7,8 +7,16 @@
     android:id="@+id/mainfrag"
     tools:context=".MainFragment">
 
-    <ListView
-        android:id="@+id/fileList"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/fileList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </FrameLayout>

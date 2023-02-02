@@ -2,16 +2,12 @@ package com.example.memo_android;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,18 +24,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 
 public class MainActivity extends AppCompatActivity {
-
 
 
     private boolean fabMain_status = false;
     private FloatingActionButton fabNew;
     private FloatingActionButton fabOpen;
 
+    private ArrayList<String> txtList;
+    private String filename;
     WriteFragment wr;
     MainFragment mf;
 
@@ -66,18 +62,22 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"NonConstantResurceId", "NonConstantResourceId"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId ()) {
-            case R.id.item1:
+        Fragment fragment = getSupportFragmentManager().getFragments().get(0);
+        if(fragment instanceof WriteFragment){
+            if (item.getItemId() == R.id.item1) {
+                save(wr.title(),wr.content());
                 return true;
-            default:
-                return super.onOptionsItemSelected (item);
+            }
         }
-    }
 
+        return super.onOptionsItemSelected(item);
+    }
 
     public void setFab(){
         wr = new WriteFragment();
         mf = new MainFragment();
+
+
         getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
 
         FloatingActionButton fabMain = findViewById(R.id.fabMain);
@@ -88,15 +88,16 @@ public class MainActivity extends AppCompatActivity {
 
         fabOpen.setOnClickListener(v -> {
             Toast.makeText(MainActivity.this, "저장", Toast.LENGTH_SHORT).show();
-//            save(wr.title(),wr.content());
-            openFile();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
+            save(wr.title(),wr.content());
         });
-        fabNew.setOnClickListener(view -> {
-            Toast.makeText(MainActivity.this, "New", Toast.LENGTH_SHORT).show();
-            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, wr).commit();
-            wr.newText();
-            isFileExistsCheck();
-        });
+        fabNew.setOnClickListener(view -> newPage());
+    }
+
+    public void newPage(){
+        getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, wr).commit();
+        wr.newText();
+
     }
 
 
@@ -119,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void openFile(){
-        ArrayList<String> txtList = new ArrayList<>();
-        String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/heheh.txt";
+    public void openFile(String path){
+        txtList = new ArrayList<>();
+        String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/"+path;
         File txt = new File(filepath);
-        String filename = txt.getName();
+        filename = txt.getName();
 
         try{
             BufferedReader br = new BufferedReader(new FileReader(txt));
@@ -140,12 +141,16 @@ public class MainActivity extends AppCompatActivity {
         }catch (NullPointerException e){
             Log.d("TEST", "null");
         }
+    }
 
-        wr.setText(txtList, filename);
+    public ArrayList<String> listPass(){
+        return txtList;
+    }
+    public String namePass(){
+        return filename.substring(0, filename.length()-4);
     }
 
     public void save(String title, String content){ //TODO 파일 저장
-
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
 
            try{
@@ -180,5 +185,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 시스템 Back 버튼 호출 시
+
+        Fragment fragment = getSupportFragmentManager().getFragments().get(0);
+        if(fragment instanceof WriteFragment) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
+                return true;
+            }
+        }else{
+            return super.onKeyDown(keyCode, event); // 코드 제거 시 뒤로가기 기능이 수행되지 않음
+        }
+
+
+        return true;
+    }
 
 }
