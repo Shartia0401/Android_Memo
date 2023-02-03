@@ -57,10 +57,5 @@ public class MainFragment extends Fragment {
             transaction.replace(R.id.frameLayout, wr);
             transaction.commit();
         });
-
-
     }
-
-
-
 }

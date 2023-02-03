@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_toolbar,menu);
-
         return true;
     }
 
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = getSupportFragmentManager().getFragments().get(0);
         if(fragment instanceof WriteFragment){
             if (item.getItemId() == R.id.item1) {
+                Toast.makeText(getApplicationContext(), "저장", Toast.LENGTH_SHORT).show();
                 save(wr.title(),wr.content());
                 return true;
             }
@@ -86,18 +87,13 @@ public class MainActivity extends AppCompatActivity {
 
         fabMain.setOnClickListener(v -> toggleFab());
 
-        fabOpen.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "저장", Toast.LENGTH_SHORT).show();
-            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
-            save(wr.title(),wr.content());
-        });
+        fabOpen.setOnClickListener(v -> {getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();});
         fabNew.setOnClickListener(view -> newPage());
     }
 
     public void newPage(){
         getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, wr).commit();
         wr.newText();
-
     }
 
 
@@ -183,8 +179,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return files;
     }
-
-
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 시스템 Back 버튼 호출 시
 
@@ -197,8 +191,6 @@ public class MainActivity extends AppCompatActivity {
         }else{
             return super.onKeyDown(keyCode, event); // 코드 제거 시 뒤로가기 기능이 수행되지 않음
         }
-
-
         return true;
     }
 

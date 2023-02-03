@@ -16,7 +16,7 @@
             android:id="@+id/MainText"
             android:layout_width="365dp"
             android:layout_height="453dp"
-            android:layout_marginBottom="36dp"
+            android:layout_marginBottom="10dp"
             android:background="@null"
             android:ems="10"
             android:gravity="start|top"
@@ -26,32 +26,56 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/TitleText"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_bias="1.0"
             tools:ignore="Autofill" />
 
         <EditText
             android:id="@+id/TitleText"
             android:layout_width="369dp"
             android:layout_height="56dp"
-            android:layout_marginTop="84dp"
+            android:layout_marginTop="140dp"
             android:background="@null"
             android:ems="10"
             android:hint="제목"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.547"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="Autofill,MissingConstraints" />
 
         <SearchView
             android:id="@+id/SearchView"
-            android:layout_width="377dp"
+            android:layout_width="350dp"
             android:layout_height="50dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.454"
+            app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <SeekBar
+            android:id="@+id/SizeBar"
+
+            android:layout_width="367dp"
+            android:layout_height="19dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/TitleText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Switch
+            android:id="@+id/IsBoldSw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:text="BOLD"
+
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.066"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UnknownId,UseSwitchCompatOrMaterialXml" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -1,13 +1,23 @@
 package com.example.memo_android;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SearchView;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
@@ -20,40 +30,66 @@ public class WriteFragment extends Fragment{
     private SearchView searchView;
     private boolean first;
 
+    SpannableString spannableString;
+    private SeekBar sizeBar;
+    private Switch isBoldSw;
+    private String defaultTxT;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_write, container, false);
-        fnClear(v);
-        first = true;
 
+
+        fnClear(v);
+        getFile();
+        return v;
+    }
+
+    private void getFile(){
         if(getArguments() != null){
             first = false;
             String name = getArguments().getString("path");
             act.openFile(name);
             setText(act.listPass(), act.namePass());
         }
-
-        return v;
     }
+
+    private void setSw(){
+        isBoldSw.setOnCheckedChangeListener((compoundButton, b) -> {
+            spannableString = new SpannableString(et_content.getText().toString());
+            if(b){
+                spannableString.setSpan(new StyleSpan(Typeface.BOLD),0, et_content.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                et_content.setText(spannableString);
+            }else{
+                et_content.setText(defaultTxT);
+            }
+        });
+    }
+
+    private  void setSizeBar(){
+
+
+    }
+
 
     private void fnClear(View v){
         act = new MainActivity();
         searchView = v.findViewById(R.id.SearchView);
         et_title = v.findViewById(R.id.TitleText);
         et_content = v.findViewById(R.id.MainText);
+        sizeBar = v.findViewById(R.id.SizeBar);
+        isBoldSw = v.findViewById(R.id.IsBoldSw);
+        setSw();
 
+        first = true;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 search(s);
-                Log.d("tlqkf",s);
                 return true;
             }
             @Override
-            public boolean onQueryTextChange(String s) {
-                Log.d("tlqkf", s);
-                return false;
-            }
+            public boolean onQueryTextChange(String s) {return false;}
         });
     }
     public String title() {
@@ -81,22 +117,24 @@ public class WriteFragment extends Fragment{
     public String content(){
         String content;
         try{
-            content = et_content.getText().toString().trim();
+            if(defaultTxT == null){
+                defaultTxT = et_content.getText().toString().trim();
+            }
         }catch (NullPointerException e){
             e.getStackTrace();
-            content = null;
+            defaultTxT = null;
         }
+        content = defaultTxT;
         return content;
     }
 
     public String content(ArrayList<String> text_list){
-        String content = null;
+        String content = "";
 
         for(int i = 0; i < text_list.size(); i++){
             content += text_list.get(i);
-            Log.d("test", content);
         }
-
+        defaultTxT = content;
         return content;
     }
     public void newText(){
@@ -110,23 +148,35 @@ public class WriteFragment extends Fragment{
     public void setText(ArrayList<String> txtlist, String fileName){
         et_title.setText(title(fileName));
         et_content.setText(content(txtlist));
+        String A = et_content.getText().toString();
     }
 
+    public void setFont(String source, ArrayList<Integer> index, String word){
+        spannableString = new SpannableString(source);
+        for(int idx : index){
+            spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#FF6702")), idx, idx + word.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            spannableString.setSpan(new RelativeSizeSpan(1.3f),idx, idx + word.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        et_content.setText(spannableString);
+    }
 
     public void search(String word){
         boolean asd = true;
+
         String source = et_content.getText().toString();
         ArrayList<Integer> index = new ArrayList<Integer>();
         int fromindex = 0;
         int i = 0;
         while(asd){
-            if(source.indexOf(word, i+1) != -1){
-                index.add(source.indexOf(word, i+1));
+            if(source.indexOf(word, fromindex) != -1){
+                index.add(source.indexOf(word, fromindex));
                 fromindex = index.get(i);
-                i++;
+                ++fromindex;
+                ++i;
             }else{
                 asd = false;
             }
         }
+        setFont(source, index, word);
     }
 }
