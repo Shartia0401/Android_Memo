@@ -29,11 +29,13 @@ public class WriteFragment extends Fragment{
     private  MainActivity act;
     private SearchView searchView;
     private boolean first;
+    private boolean isBold;
 
     SpannableString spannableString;
     private SeekBar sizeBar;
     private Switch isBoldSw;
     private String defaultTxT;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,20 +56,39 @@ public class WriteFragment extends Fragment{
         }
     }
 
+
+
     private void setSw(){
         isBoldSw.setOnCheckedChangeListener((compoundButton, b) -> {
             spannableString = new SpannableString(et_content.getText().toString());
             if(b){
                 spannableString.setSpan(new StyleSpan(Typeface.BOLD),0, et_content.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 et_content.setText(spannableString);
+                isBold = true;
             }else{
                 et_content.setText(defaultTxT);
+                isBold = false;
             }
         });
     }
 
     private  void setSizeBar(){
+        sizeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d("test" , Integer.toString(seekBar.getProgress()));
+            }
+        });
 
     }
 
@@ -80,7 +101,7 @@ public class WriteFragment extends Fragment{
         sizeBar = v.findViewById(R.id.SizeBar);
         isBoldSw = v.findViewById(R.id.IsBoldSw);
         setSw();
-
+        setSizeBar();
         first = true;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
