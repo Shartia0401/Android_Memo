@@ -1,4 +1,4 @@
-package com.example.memo_android;
+package com.example.Memo_android;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -31,6 +31,7 @@ public class MainFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         act = new MainActivity();
         listAdd(v);
+
         return v;
     }
 
@@ -41,21 +42,21 @@ public class MainFragment extends Fragment {
 
         ArrayList<String> listItem = new ArrayList<>();
         ArrayAdapter<String> adapter;
-//        File[] list = act.isFileExistsCheck();
-//        for(File file : list){
-//            listItem.add(file.getName());
-//        }
-//        listView = v.findViewById(R.id.fileList);
-//        adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1, listItem);
-//        listView.setAdapter(adapter);
-//        listView.setOnItemClickListener((adapterView, view, i, l) -> {
-//            WriteFragment wr = new WriteFragment();
-//            String path = (String) adapterView.getItemAtPosition(i);
-//            bundle.putString("path", path);
-//            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-//            wr.setArguments(bundle);
-//            transaction.replace(R.id.frameLayout, wr);
-//            transaction.commit();
-//        });
+        File[] list = act.isFileExistsCheck();
+        for(File file : list){
+            listItem.add(file.getName());
+        }
+        listView = v.findViewById(R.id.fileList);
+        adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1, listItem);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            WriteFragment wr = new WriteFragment();
+            String path = (String) adapterView.getItemAtPosition(i);
+            bundle.putString("path", path);
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            wr.setArguments(bundle);
+            transaction.replace(R.id.frameLayout, wr);
+            transaction.commit();
+        });
     }
 }

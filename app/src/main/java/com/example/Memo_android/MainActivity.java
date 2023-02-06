@@ -1,4 +1,4 @@
-package com.example.memo_android;
+package com.example.Memo_android;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 
@@ -39,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private String filename;
     WriteFragment wr;
     MainFragment mf;
+    ArrayList<String> optionStr;
+
+    File currentFile;
+    File optionFile;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         setFab();
     }
@@ -111,17 +117,23 @@ public class MainActivity extends AppCompatActivity {
             fs_animation.start();
         }
 
+
         fabMain_status = !fabMain_status;
 
     }
 
 
-    public void openFile(String path){
-        txtList = new ArrayList<>();
+    public File openFile(String path){
+
         String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/"+path;
         File txt = new File(filepath);
         filename = txt.getName();
+        return txt;
+    }
 
+    public void openContent(File txt){
+
+        txtList = new ArrayList<>();
         try{
             BufferedReader br = new BufferedReader(new FileReader(txt));
             String str = br.readLine();
@@ -138,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TEST", "null");
         }
     }
+
+
 
     public ArrayList<String> listPass(){
         return txtList;
@@ -185,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = getSupportFragmentManager().getFragments().get(0);
         if(fragment instanceof WriteFragment) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
+
                 getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
                 return true;
             }
@@ -192,6 +207,99 @@ public class MainActivity extends AppCompatActivity {
             return super.onKeyDown(keyCode, event); // 코드 제거 시 뒤로가기 기능이 수행되지 않음
         }
         return true;
+    }
+
+    public void readOption(){
+        optionStr = new ArrayList<String>();
+        optionFile = openFile("Option.txt");
+
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(optionFile));
+            String str = br.readLine();
+            while(str !=null){
+                optionStr.add(str);
+                str = br.readLine();
+            }
+
+            br.close();
+        }catch(IOException e){
+            e.getStackTrace();
+            Log.d("TEST", e.toString());
+        }catch (NullPointerException e){
+            Log.d("TEST", "null");
+        }
+
+    }
+
+    public String[] getOption(String name){
+        for(String a : optionStr){
+            String[] str = a.split(",");
+            if(str[0].equals(name) && str[0].length() == name.length()){
+                return str;
+            }
+        }
+        return null;
+    }
+
+    public void optionSave(String name, boolean isBold, int size){
+        String option = "";
+        boolean newOption = true;
+
+
+
+        for(String fileName : optionStr){
+            String[] str = fileName.split(",");
+            if( str[0].equals(name) && str[0].length() == name.length()){
+                newOption = false;
+                String s;
+                if(isBold){
+                    s = "true";
+                }else{
+                    s = "false";
+                }
+                str[1] = s;
+                str[2] = Integer.toString(size);
+            }else{
+                newOption = true;
+            }
+        }
+
+        for(int i = 0; i < optionStr.size(); i++){
+            option += optionStr.get(i);
+        }
+
+        if(newOption){
+            String s;
+            if(isBold){
+                s = "true";
+            }else{
+                s = "false";
+            }
+
+            option += "\n"+ name+","+s+","+size;
+        }
+
+
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+
+            try{
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), "Option.txt");
+                try{
+                    FileWriter fw = new FileWriter(file, false);
+                    fw.write(option);
+                    fw.close();
+                } catch (IOException e){
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
+                }
+            }catch (NullPointerException e){
+                e.getStackTrace();
+            }
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 }
