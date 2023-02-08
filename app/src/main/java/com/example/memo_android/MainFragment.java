@@ -1,4 +1,4 @@
-package com.example.Memo_android;
+package com.example.memo_android;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,32 +17,28 @@ import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
     ListView listView;
-    MainActivity act;
+    FileSystem fileSystem;
 
     @Override
     public void onAttach(@NonNull Context context){
         super.onAttach(context);
 
     }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
-        act = new MainActivity();
+        fileSystem = new FileSystem();
         listAdd(v);
 
         return v;
     }
-
-
 
     public void listAdd(View v){
         Bundle bundle = new Bundle();
 
         ArrayList<String> listItem = new ArrayList<>();
         ArrayAdapter<String> adapter;
-        File[] list = act.isFileExistsCheck();
+        File[] list = fileSystem.isFileExistsCheck();
         for(File file : list){
             listItem.add(file.getName());
         }

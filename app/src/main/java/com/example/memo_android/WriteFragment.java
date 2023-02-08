@@ -1,4 +1,4 @@
-package com.example.Memo_android;
+package com.example.memo_android;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -19,48 +19,56 @@ import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import java.io.File;
 import java.util.ArrayList;
 
 
 public class WriteFragment extends Fragment{
 
-    static private EditText et_title, et_content;
-    private  MainActivity act;
-    private SearchView searchView;
-    private boolean first;
+    public EditText et_title, et_content;
+    private  FileSystem fileSystem;
     public boolean isBold;
     public int currentSize;
 
     SpannableString spannableString;
     private SeekBar sizeBar;
+
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch isBoldSw;
     private String defaultTxT;
     private String defaultTitle;
-
+    File currentFile;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_write, container, false);
-        defaultTxT = "";
         fnClear(v);
-        getFile();
-
+        defaultTxT = "";
         spannableString = new SpannableString(defaultTxT);
         return v;
     }
 
-    private void getFile(){
-        if(getArguments() != null){
-            first = false;
-            String name = getArguments().getString("path");
-            act.openFile(name);
-            act.openContent(act.openFile(name));
-            setText(act.listPass(), act.namePass());
-        }
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.err.println("resume");
+        et_content.setText("");
+        et_title.setText("");
+        getFile();
     }
 
+    private void getFile(){
+        if(getArguments() != null){
+            System.err.println("파일");
+            String name = getArguments().getString("path");
+            currentFile = fileSystem.openFile(name);
+            fileSystem.openContent(fileSystem.openFile(name));
+            setText(fileSystem.listPass(), currentFile.getName().substring(0, currentFile.getName().length() - 4));
+        }
+    }
     private void setSw(){
         isBoldSw.setOnCheckedChangeListener((compoundButton, b) -> {
             isBold = b;
@@ -81,26 +89,15 @@ public class WriteFragment extends Fragment{
         });
 
     }
-
-
-
     private void textAct(){
 
         et_title.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                defaultTitle = charSequence.toString();
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {defaultTitle = charSequence.toString();}
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
         });
 
         et_content.addTextChangedListener(new TextWatcher() {
@@ -109,12 +106,10 @@ public class WriteFragment extends Fragment{
                 //입력난 변화
 
             }
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 defaultTxT = charSequence.toString();
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
                 // 입력하기전에 조치
@@ -125,8 +120,8 @@ public class WriteFragment extends Fragment{
 
 
     private void fnClear(View v){
-        act = new MainActivity();
-        searchView = v.findViewById(R.id.SearchView);
+        fileSystem = new FileSystem();
+        SearchView searchView = v.findViewById(R.id.SearchView);
         et_title = v.findViewById(R.id.TitleText);
         et_content = v.findViewById(R.id.MainText);
         sizeBar = v.findViewById(R.id.SizeBar);
@@ -134,11 +129,9 @@ public class WriteFragment extends Fragment{
         currentSize = 10;
         sizeBar.setProgress(10);
 
-
         textAct();
         setSw();
         setSizeBar();
-        first = true;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -196,19 +189,17 @@ public class WriteFragment extends Fragment{
         defaultTxT = content;
         return content;
     }
-    public void newText(){
-        if(first){
-            if(et_content.getText().toString().length() != 0 || et_title.getText().toString().length() != 0){
-                defaultTitle = "";
-                defaultTxT = "";
-                isBold = false;
-                currentSize = 10;
-                first = false;
-                et_title.setText(defaultTitle);
-                et_content.setText(defaultTxT);
-            }
+
+    public String isBold(){
+        if(isBold){
+            return "true";
+        }
+        else{
+            return "false";
         }
     }
+
+
     public void setText(ArrayList<String> txtlist, String fileName){
         et_title.setText(title(fileName));
         et_content.setText(content(txtlist));
@@ -260,4 +251,6 @@ public class WriteFragment extends Fragment{
         }
         setFont(index, word);
     }
+
+
 }
