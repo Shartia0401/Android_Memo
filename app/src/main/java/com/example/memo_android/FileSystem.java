@@ -81,6 +81,22 @@ public class FileSystem {
             Log.d("TEST", "null");
         }
     }
+
+    public void fileDel(String path){
+
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + path;
+
+        try{
+            File file = new File(filePath);
+
+            if(file.exists()){
+                file.delete();
+            }
+        }catch(Exception e){
+            e.getStackTrace();
+        }
+    }
+
     public ArrayList<String> listPass(){
         return txtList;
     }

@@ -8,11 +8,11 @@
         android:title="메뉴1"
         android:icon="@android:drawable/ic_menu_save"
         app:showAsAction="always"/>
-<!--    <item-->
-<!--        android:id="@+id/item2"-->
-<!--        android:enabled="true"-->
-<!--        android:title="메뉴2"-->
-<!--        android:icon="@android:drawable/ic_menu_zoom"-->
-<!--        app:showAsAction="always"/>-->
+    <item
+        android:id="@+id/item2"
+        android:enabled="true"
+        android:title="메뉴2"
+        android:icon="@android:drawable/ic_delete"
+        app:showAsAction="always"/>
 
 </menu>

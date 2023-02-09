@@ -32,14 +32,15 @@ public class WriteFragment extends Fragment{
     private  FileSystem fileSystem;
     public boolean isBold;
     public int currentSize;
-
     SpannableString spannableString;
     private SeekBar sizeBar;
-
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch isBoldSw;
     private String defaultTxT;
     private String defaultTitle;
+
+    private final int defaultsize = 10;
+    private final boolean defaultBold = false;
     File currentFile;
 
     @Override
@@ -50,20 +51,29 @@ public class WriteFragment extends Fragment{
         spannableString = new SpannableString(defaultTxT);
         return v;
     }
-
     @Override
     public void onResume() {
         super.onResume();
         System.err.println("resume");
         et_content.setText("");
         et_title.setText("");
+
         getFile();
     }
 
     private void getFile(){
         if(getArguments() != null){
+            currentSize = defaultsize;
+            isBold = defaultBold;
+
+
             System.err.println("파일");
             String name = getArguments().getString("path");
+            if(getArguments().getString("isBold") != null){
+                currentSize = Integer.parseInt(getArguments().getString("size"));
+                isBold = Boolean.parseBoolean(getArguments().getString("isBold"));
+            }
+
             currentFile = fileSystem.openFile(name);
             fileSystem.openContent(fileSystem.openFile(name));
             setText(fileSystem.listPass(), currentFile.getName().substring(0, currentFile.getName().length() - 4));
@@ -87,7 +97,6 @@ public class WriteFragment extends Fragment{
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-
     }
     private void textAct(){
 
@@ -151,7 +160,6 @@ public class WriteFragment extends Fragment{
             title = et_title.getText().toString().trim();
         }catch (NullPointerException e){
             e.getStackTrace();
-            title = null;
         }
 
         return title;
