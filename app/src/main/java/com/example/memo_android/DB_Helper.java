@@ -61,7 +61,15 @@ public class DB_Helper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM styleDB WHERE fileName= '"+ fileName + "';");
         db.close();
     }
+    public void modify(String AfterName, String BeforeName){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = getID(BeforeName);
+        int id = cursor.getInt(0);
 
+        String sql = "UPDATE styleDB SET fileName = '"+ AfterName +"' WHERE _num = '"+ id +"' ";
+
+        db.execSQL(sql);
+    }
     /**
      *
      */
@@ -80,12 +88,22 @@ public class DB_Helper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         //DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
-        Cursor cursor = db.rawQuery("SELECT isBold, size FROM styleDB WHERE '"+name+"'", null);
+        Cursor cursor = db.rawQuery("SELECT isBold, size FROM styleDB WHERE fileName = '"+name+"'", null);
 
         return cursor;
     }
 
-    public boolean InsertOrUpdate(String title){
+    public Cursor getID(String name){
+        //읽기가 가능하게 DB 열기
+        SQLiteDatabase db = getReadableDatabase();
+
+        //DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
+        Cursor cursor = db.rawQuery("SELECT _num FROM styleDB WHERE fileName = '"+name+"'", null);
+
+        return cursor;
+    }
+
+    public boolean   InsertOrUpdate(String title){
         Cursor cursor = getUserList();
         boolean a = false;
         cursor.moveToLast();

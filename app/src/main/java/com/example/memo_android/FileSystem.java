@@ -72,7 +72,6 @@ public class FileSystem {
                 txtList.add(str);
                 str = br.readLine();
             }
-
             br.close();
         }catch(IOException e){
             e.getStackTrace();
@@ -95,6 +94,21 @@ public class FileSystem {
         }catch(Exception e){
             e.getStackTrace();
         }
+    }
+
+    public boolean checkfile(String path){
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + path;
+
+        try{
+            File file = new File(filePath);
+
+            if(file.exists()){
+                return true;
+            }
+        }catch(Exception e){
+            e.getStackTrace();
+        }
+        return false;
     }
 
     public ArrayList<String> listPass(){

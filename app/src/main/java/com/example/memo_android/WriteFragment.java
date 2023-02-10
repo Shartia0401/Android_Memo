@@ -18,8 +18,6 @@ import android.widget.EditText;
 import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.Switch;
-
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
@@ -39,7 +37,7 @@ public class WriteFragment extends Fragment{
     private String defaultTxT;
     private String defaultTitle;
 
-    private final int defaultsize = 10;
+    public final int defaultsize = 10;
     private final boolean defaultBold = false;
     File currentFile;
 
@@ -49,6 +47,10 @@ public class WriteFragment extends Fragment{
         fnClear(v);
         defaultTxT = "";
         spannableString = new SpannableString(defaultTxT);
+        currentSize = defaultsize;
+        isBold = defaultBold;
+        setUI();
+
         return v;
     }
     @Override
@@ -72,13 +74,30 @@ public class WriteFragment extends Fragment{
             if(getArguments().getString("isBold") != null){
                 currentSize = Integer.parseInt(getArguments().getString("size"));
                 isBold = Boolean.parseBoolean(getArguments().getString("isBold"));
+                setFontSize();
+                sizeBar.setProgress(currentSize);
+                isBoldSw.setChecked(isBold);
+            }else{
+                try{
+                    setUI();
+                }catch (NullPointerException e){
+                    e.getStackTrace();
+                }
             }
 
             currentFile = fileSystem.openFile(name);
             fileSystem.openContent(fileSystem.openFile(name));
             setText(fileSystem.listPass(), currentFile.getName().substring(0, currentFile.getName().length() - 4));
+        }else if(getArguments().getString("path") == null){
+            currentFile = null;
         }
     }
+
+    public void setUI(){
+        sizeBar.setProgress(currentSize);
+        isBoldSw.setChecked(isBold);
+    }
+
     private void setSw(){
         isBoldSw.setOnCheckedChangeListener((compoundButton, b) -> {
             isBold = b;
@@ -124,9 +143,7 @@ public class WriteFragment extends Fragment{
                 // 입력하기전에 조치
             }
         });
-
     }
-
 
     private void fnClear(View v){
         fileSystem = new FileSystem();

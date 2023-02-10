@@ -2,8 +2,9 @@ package com.example.memo_android;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements SendPath{
     MainFragment mf;
     FloatingActionButton fabNew;
     FloatingActionButton fabOpen;
+    FloatingActionButton fabMain;
     FileSystem fileSystem;
 
     DB_Helper dbHelper;
@@ -61,12 +63,21 @@ public class MainActivity extends AppCompatActivity implements SendPath{
         switch (item.getItemId()) {
             case R.id.item1:
                 if(fragment instanceof WriteFragment){
-                    Toast.makeText(getApplicationContext(), "저장", Toast.LENGTH_SHORT).show();
-                    fileSystem.save(wr.title(),wr.content()); //TODO 세이브
-                    if(dbHelper.InsertOrUpdate(wr.title())){
-                        dbHelper.update(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+
+                    if(fileSystem.checkfile(wr.title() + ".txt") && !wr.currentFile.getName().equals(wr.title() + ".txt")){
+                        onClick_setting_costume_save();
                     }else{
-                        dbHelper.insert(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+                        if(!wr.currentFile.getName().equals(wr.title() + ".txt")){
+                            fileSystem.fileDel(wr.currentFile.getName());
+                        }
+                        fileSystem.save(wr.title(),wr.content()); //TODO 세이브
+                        wr.currentFile = fileSystem.openFile(wr.title());
+                        if(dbHelper.InsertOrUpdate(wr.title())){
+                            dbHelper.update(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+                        }else{
+                            dbHelper.insert(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+                        }
+                        Toast.makeText(getApplicationContext(), "저장", Toast.LENGTH_SHORT).show();
                     }
                     return true;
                 }
@@ -74,7 +85,12 @@ public class MainActivity extends AppCompatActivity implements SendPath{
             case R.id.item2:
                 isModify = !isModify;
                 toast.cancel();
-                toast.setText(Boolean.toString(isModify));
+                if(isModify){
+                    toast.setText("수정모드 ON");
+                }else{
+                    toast.setText("수정모드 OFF");
+                }
+
                 toast.show();
 
                 Bundle bundle = new Bundle();
@@ -92,20 +108,37 @@ public class MainActivity extends AppCompatActivity implements SendPath{
         dbHelper = new DB_Helper(getApplicationContext());
     }
     public void setFab(){
-        FloatingActionButton fabMain = findViewById(R.id.fabMain);
+        fabMain = findViewById(R.id.fabMain);
         fabNew = findViewById(R.id.fabNew);
         fabOpen = findViewById(R.id.fabOpen);
         fabMain.setOnClickListener(v -> toggleFab());
-        fabOpen.setOnClickListener(v -> {getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();});
+        fabOpen.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
+            wr.et_title.setText("");
+            wr.et_content.setText("");
+            wr.isBold = false;
+            wr.currentSize = wr.defaultsize;
+            wr.currentFile = null;
+            wr.setUI();
+        });
         fabNew.setOnClickListener(view -> {
             Bundle bundle = new Bundle();
             bundle.putString("path", null);
+            bundle.putString("isBold", null);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             wr.setArguments(bundle);
             transaction.replace(R.id.frameLayout, wr);
             transaction.commit();
-            wr.et_title.setText("");
-            wr.et_content.setText("");
+            try{
+                wr.et_title.setText("");
+                wr.et_content.setText("");
+                wr.isBold = false;
+                wr.currentSize = wr.defaultsize;
+                wr.currentFile = null;
+                wr.setUI();
+            }catch (NullPointerException e){
+                e.getStackTrace();
+            }
         });
     }
     public void toggleFab(){
@@ -114,11 +147,17 @@ public class MainActivity extends AppCompatActivity implements SendPath{
             fn_animation.start();
             ObjectAnimator fs_animation = ObjectAnimator.ofFloat(fabOpen, "translationY", 0f);
             fs_animation.start();
+            ObjectAnimator fm_anmation = ObjectAnimator.ofFloat(fabMain, "rotation", 0 );
+
+            fm_anmation.start();
+
         } else{
             ObjectAnimator fn_animation = ObjectAnimator.ofFloat(fabNew, "translationY", -200f);
             fn_animation.start();
             ObjectAnimator fs_animation = ObjectAnimator.ofFloat(fabOpen, "translationY", -400f);
             fs_animation.start();
+            ObjectAnimator fm_anmation = ObjectAnimator.ofFloat(fabMain, "rotation", 135 );
+            fm_anmation.start();
         }
         fabMain_status = !fabMain_status;
     }
@@ -128,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements SendPath{
         if(fragment instanceof WriteFragment) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, mf).commit();
+
                 return true;
             }
         }else{
@@ -144,14 +184,41 @@ public class MainActivity extends AppCompatActivity implements SendPath{
         bundle.putString("path", s);
         if(dbHelper.InsertOrUpdate(s.substring(0, s.length()-4))){
             Cursor cursor = dbHelper.getUserList(s.substring(0, s.length()-4));
+            cursor.moveToFirst();
             bundle.putString("isBold", cursor.getString(0));
             bundle.putString("size", cursor.getString(1));
         }
-
-
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         wr.setArguments(bundle);
         transaction.replace(R.id.frameLayout, wr);
         transaction.commit();
+    }
+    private void onClick_setting_costume_save(){
+        new AlertDialog.Builder(this)
+                .setTitle("파일 덮어쓰기")
+                .setMessage("동일한 파일이 두개 이상 있습니다. 덮어쓰기 하시겠습니까?")
+                .setIcon(android.R.drawable.ic_menu_save)
+                .setPositiveButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Toast.makeText(getApplicationContext(), "취소했습니다.", Toast.LENGTH_SHORT).show();
+                    }})
+                .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // 확인시 처리 로직
+                        fileSystem.fileDel(wr.title() + ".txt");
+
+                        if(!wr.currentFile.getName().equals(wr.title() + ".txt")){
+                            fileSystem.fileDel(wr.currentFile.getName());
+                        }
+                        fileSystem.save(wr.title(),wr.content()); //TODO 세이브
+                        wr.currentFile = fileSystem.openFile(wr.title());
+                        if(dbHelper.InsertOrUpdate(wr.title())){
+                            dbHelper.update(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+                        }else{
+                            dbHelper.insert(wr.title(), wr.isBold(), Integer.toString(wr.currentSize));
+                        }
+                        Toast.makeText(getApplicationContext(), "저장", Toast.LENGTH_SHORT).show();
+                    }})
+                .show();
     }
 }
